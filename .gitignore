@@ -1,6 +1,9 @@
 # Local config data
 config
 
+# IntelliJ flies
+.idea
+
 # Logs
 logs
 *.log
