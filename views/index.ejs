@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Chart.js</title>
+    <link rel="stylesheet" href="main.css">
+</head>
+<body>
+
+<canvas id="myChart" width="800" height="300"></canvas>
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js"></script>
+<script>
+var ctx = document.getElementById('myChart');
+
+var values = [1,2,3,4];
+var labels = ['A', 'B', 'C', 'D'];
+
+
+
+<%for(var i = 0; i < meteringpoints.length; i++){
+
+    var timeLabel = meteringpoints[i].endTime.toLocaleString();
+    var date = new Date(timeLabel);
+    //date = date.getDate() + "-" + date.getHours();
+    date = date.toLocaleString();
+    %>
+    //alert('<%=meteringpoints[i].value%>');
+    values[<%=i%>] = <%=meteringpoints[i].value%>;
+    labels[<%=i%>] = '<%=date%>';
+    <%
+
+}%>
+
+//alert('<%=meteringpoints.length%>');
+
+var myChart = new Chart(ctx, {
+ type: 'bar',
+ data: {
+    labels: labels,
+    datasets: [{
+        label: 'Strømforbruk',
+        color: "rgba(0,255,0,0.5)",
+        fillColor: "rgba(220,220,220,0.5)",
+        strokeColor: "rgba(220,220,220,0.8)",
+        highlightFill: "rgba(220,220,220,0.75)",
+        highlightStroke: "rgba(220,220,220,1)",
+        data: values
+    }],
+    color: "rgba(0,255,0,0.5)"
+ },
+    color: "rgba(0,220,0,0.5)"
+})
+</script>
+</body>
+</html>
