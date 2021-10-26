@@ -1,4 +1,10 @@
 
+## Purpose
+This is a project for showing power metering values from the Elvia API
+https://elvia.portal.azure-api.net/docs/services/metervalueapi/operations/get-api-v1-metervalues
+
+Using Chart.js for showing the data
+
 ## Configuration needed after code is downloaded
 
 Need to create a config-directory with 1 files called
@@ -17,3 +23,6 @@ https://www.elvia.no/minside/ "select you user" -> "tilganger" -> "Opprett token
 Run the following command:
 node server.js
 
+## Known limitations/bugs
+- Quite large delay on data, sometimes several hours.
+- Only possible to show data with a "resolution" of 60 minutes
