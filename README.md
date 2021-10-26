@@ -15,6 +15,7 @@ With 1 file called common.json:
 
     {
         "authkey": "AUTHKEY",
+        "meteringpointId" : "ID of the meetering point",
         "port": 8081
     }
 
