@@ -33,8 +33,11 @@ SUBSCRIPTION KEY is the subscription key for the tariff service.
 Check out this code.
 Create common.json in a the config-folder, according to above.
 
-Run the following command:
-node server.js
+Run the following command once to download modules:
+npm install
+
+Run one of the following command to star application/server:
+node server.js or npm start
 
 ## Known limitations/bugs
 - Quite large delay on data, sometimes several hours.
