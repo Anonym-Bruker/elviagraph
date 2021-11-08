@@ -15,6 +15,7 @@ var labels = ['Init...'];
 app.set('view engine', 'ejs');
 
 var meteringpoints = {};
+var tariffPrice = {};
 
 app.get('/', function (req, res) {
    fetchData().then(result => {
@@ -23,7 +24,8 @@ app.get('/', function (req, res) {
              {
                 values,
                 labels,
-                meteringpoints
+                meteringpoints,
+                tariffPrice
              })
       }
       else{
@@ -32,7 +34,8 @@ app.get('/', function (req, res) {
              {
                 values,
                 labels,
-                meteringpoints
+                meteringpoints,
+                tariffPrice
              })
       }
    })
@@ -43,7 +46,7 @@ app.get('/', function (req, res) {
 fetchData();
 
 
-function addDays(days, date) {
+function removeDays(days, date) {
    //var date = new Date(this.valueOf());
    date.setDate(date.getDate() - days);
    return date;
@@ -69,7 +72,7 @@ async function fetchData(){
    var toDate = addHours(3, currentdate);
    toDate = toDate.toISOString();
 
-   var startDate = addDays(2, currentdate);
+   var startDate = removeDays(3, currentdate);
    startDate = startDate.toISOString();
    logging("StartDate:" + startDate + ", " + "ToDate:" + toDate);
 
@@ -89,6 +92,28 @@ async function fetchData(){
       error != null ? logging('***** ERROR ***** : ', error) : null;
       meteringpoints = response.meteringpoints[0].metervalue.timeSeries;
    } );
+
+   var subkey = config.subkey;
+   var tariffkey = config.tariffkey;
+   url = "https://elvia.azure-api.net/grid-tariff/api/1/tariffquery?TariffKey="+tariffkey+"&StartTime="+startDate+"&EndTime="+toDate;
+
+   Request.get( {
+      url : url,
+      headers : {
+         "Ocp-Apim-Subscription-Key" : subkey
+      },
+      rejectUnauthorized: true,
+      requestCert: false,
+      agent: false
+   }, function(error, response, body) {
+      var response = JSON.parse(body);
+      error != null ? logging('***** ERROR ***** : ', error) : null;
+      tariffPrice = response.gridTariff.tariffPrice.priceInfo;
+      //logging(tariffPrice.length);
+      //logging(JSON.stringify(tariffPrice));
+   } );
+
+
 
    logging("Done with getting data....");
    return "OK";

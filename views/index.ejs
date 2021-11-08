@@ -10,14 +10,21 @@
 <body>
 
 <canvas id="myChart" width="800" height="300"></canvas>
+
+<canvas id="myChartPrice" width="800" height="300"></canvas>
     
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js"></script>
 <script>
 var ctx = document.getElementById('myChart');
 
+var ctxPrice = document.getElementById('myChartPrice');
+
 var values = [1,2,3,4];
 var labels = ['A', 'B', 'C', 'D'];
 
+var valuesFixed = [1,2,3,4];
+var valuesVariable = [1,2,3,4];
+var labelsPrice = ['A', 'B', 'C', 'D'];
 
 
 <%for(var i = 0; i < meteringpoints.length; i++){
@@ -34,8 +41,23 @@ var labels = ['A', 'B', 'C', 'D'];
 
 }%>
 
-//alert('<%=meteringpoints.length%>');
+<%for(var i = 0; i < tariffPrice.length; i++){
 
+    var timeLabel = tariffPrice[i].expiredAt.toLocaleString();
+    var date = new Date(timeLabel);
+    //date = date.getDate() + "-" + date.getHours();
+    date = date.toLocaleString();
+%>
+    //alert('<%=date%>');
+    valuesFixed[<%=i%>] = <%=tariffPrice[i].fixedPrices[0].priceLevel[0].total%>;
+    valuesVariable[<%=i%>] = <%=tariffPrice[i].variablePrice.total%>;
+    labelsPrice[<%=i%>] = '<%=date%>';
+<%
+
+}%>
+
+
+//alert('<%=meteringpoints.length%>');
 var myChart = new Chart(ctx, {
  type: 'bar',
  data: {
@@ -51,6 +73,34 @@ var myChart = new Chart(ctx, {
     }],
     color: "rgba(0,255,0,0.5)"
  },
+    color: "rgba(0,220,0,0.5)"
+})
+
+
+var myChartPrice = new Chart(ctxPrice, {
+    type: 'line',
+    data: {
+        labels: labelsPrice,
+        datasets: [{
+            label: 'Strømpris - Fixed',
+            color: "rgba(0,255,0,0.5)",
+            fillColor: "rgba(220,220,220,0.5)",
+            strokeColor: "rgba(220,220,220,0.8)",
+            highlightFill: "rgba(220,220,220,0.75)",
+            highlightStroke: "rgba(220,220,220,1)",
+            data: valuesFixed
+        },
+            {
+                label: 'Strømpris - Variabel',
+                color: "rgba(0,255,0,0.5)",
+                fillColor: "rgba(220,220,220,0.5)",
+                strokeColor: "rgba(220,220,220,0.8)",
+                highlightFill: "rgba(220,220,220,0.75)",
+                highlightStroke: "rgba(220,220,220,1)",
+                data: valuesVariable
+            }],
+        color: "rgba(0,255,0,0.5)"
+    },
     color: "rgba(0,220,0,0.5)"
 })
 </script>
