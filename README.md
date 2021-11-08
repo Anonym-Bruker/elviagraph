@@ -3,6 +3,9 @@
 This is a project for showing power metering values from the Elvia API
 https://elvia.portal.azure-api.net/docs/services/metervalueapi/operations/get-api-v1-metervalues
 
+And also showing tariff price information from another Elvia API:
+https://elvia.portal.azure-api.net/docs/services/gridtariffapi/operations/get-api-v-tariffquery-tariffkey-tariffkey
+
 Using Chart.js for showing the data
 
 ## Configuration needed after code is downloaded
