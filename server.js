@@ -16,6 +16,7 @@ app.set('view engine', 'ejs');
 
 var meteringpoints = {};
 var tariffPrice = {};
+var maxtime = {};
 
 app.get('/', function (req, res) {
    fetchData().then(result => {
@@ -25,7 +26,8 @@ app.get('/', function (req, res) {
                 values,
                 labels,
                 meteringpoints,
-                tariffPrice
+                tariffPrice,
+                maxtime
              })
       }
       else{
@@ -35,7 +37,8 @@ app.get('/', function (req, res) {
                 values,
                 labels,
                 meteringpoints,
-                tariffPrice
+                tariffPrice,
+                maxtime
              })
       }
    })
@@ -91,7 +94,26 @@ async function fetchData(){
       var response = JSON.parse(body);
       error != null ? logging('***** ERROR ***** : ', error) : null;
       meteringpoints = response.meteringpoints[0].metervalue.timeSeries;
+      //logging(JSON.stringify(meteringpoints))
    } );
+
+   url = "https://elvia.azure-api.net/customer/metervalues/api/v1/maxhours"
+   Request.get( {
+      url : url,
+      headers : {
+         "Authorization" : auth
+      },
+      rejectUnauthorized: true,
+      requestCert: false,
+      agent: false
+   }, function(error, response, body) {
+      var response = JSON.parse(body);
+      error != null ? logging('***** ERROR ***** : ', error) : null;
+      maxtime = response.meteringpoints[0].maxHours;
+      logging(JSON.stringify(maxtime))
+   } );
+
+
 
    var subkey = config.subkey;
    var tariffkey = config.tariffkey;

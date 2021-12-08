@@ -9,14 +9,20 @@
 </head>
 <body>
 
-<canvas id="myChart" width="800" height="300"></canvas>
+Max tid gjeldende måned: <%=(new Date(maxtime[0].startTime.toLocaleString())).toLocaleString()%>, Max strømforbruk: <%=maxtime[0].value%> <%=maxtime[0].uom%>
+<br/>
+Max tid forrige måned: <%=(new Date(maxtime[1].startTime.toLocaleString())).toLocaleString()%>, Max strømforbruk: <%=maxtime[1].value%> <%=maxtime[1].uom%>
 
-<canvas id="myChartPrice" width="800" height="300"></canvas>
+<canvas id="myChart" width="800" height="150"></canvas>
+
+<canvas id="myNetPriceChart" width="800" height="150"></canvas>
+
+<canvas id="myChartPrice" width="800" height="100"></canvas>
     
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js"></script>
 <script>
 var ctx = document.getElementById('myChart');
-
+var ctxNetPrice = document.getElementById('myNetPriceChart');
 var ctxPrice = document.getElementById('myChartPrice');
 
 var values = [1,2,3,4];
@@ -25,6 +31,9 @@ var labels = ['A', 'B', 'C', 'D'];
 var valuesFixed = [1,2,3,4];
 var valuesVariable = [1,2,3,4];
 var labelsPrice = ['A', 'B', 'C', 'D'];
+
+var valuesnetprice = [1,2,3,4];
+var labelsNetPrice = ['A', 'B', 'C', 'D'];
 
 
 <%for(var i = 0; i < meteringpoints.length; i++){
@@ -56,6 +65,26 @@ var labelsPrice = ['A', 'B', 'C', 'D'];
 
 }%>
 
+<%
+for(var t = 0; t < tariffPrice.length; t++){
+    var timetariff = tariffPrice[t].expiredAt.toLocaleString();
+    var date = new Date(timetariff);
+    date = date.toLocaleString();
+    for(var i = 0; i < meteringpoints.length; i++){
+        var timeLabel = meteringpoints[i].endTime.toLocaleString();
+        if(timetariff == timeLabel){
+            var currentPrice = tariffPrice[t].variablePrice.total * meteringpoints[i].value;
+            currentPrice = currentPrice + tariffPrice[t].fixedPrices[0].priceLevel[0].total;
+            %>
+            //alert('<%=currentPrice%>');
+            valuesnetprice[<%=i%>] = <%=currentPrice%>;
+            labelsNetPrice[<%=i%>] = '<%=date%>';
+            <%
+        }
+    }
+}
+%>
+
 
 //alert('<%=meteringpoints.length%>');
 var myChart = new Chart(ctx, {
@@ -73,6 +102,24 @@ var myChart = new Chart(ctx, {
     }],
     color: "rgba(0,255,0,0.5)"
  },
+    color: "rgba(0,220,0,0.5)"
+})
+
+var myNetPriceChart = new Chart(ctxNetPrice, {
+    type: 'bar',
+    data: {
+        labels: labelsNetPrice,
+        datasets: [{
+            label: 'Nettleie',
+            color: "rgba(0,255,0,0.5)",
+            fillColor: "rgba(220,220,220,0.5)",
+            strokeColor: "rgba(220,220,220,0.8)",
+            highlightFill: "rgba(220,220,220,0.75)",
+            highlightStroke: "rgba(220,220,220,1)",
+            data: valuesnetprice
+        }],
+        color: "rgba(0,255,0,0.5)"
+    },
     color: "rgba(0,220,0,0.5)"
 })
 
