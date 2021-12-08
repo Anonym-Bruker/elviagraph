@@ -110,7 +110,7 @@ async function fetchData(){
       var response = JSON.parse(body);
       error != null ? logging('***** ERROR ***** : ', error) : null;
       maxtime = response.meteringpoints[0].maxHours;
-      logging(JSON.stringify(maxtime))
+      //logging(JSON.stringify(maxtime))
    } );
 
 
