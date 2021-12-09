@@ -1,155 +1,283 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:border="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Chart.js</title>
+    <title>Strømforbruk-Elvia</title>
     <link rel="stylesheet" href="main.css">
 </head>
 <body>
+<script>
+    var values = [1,2,3,4];
+    var valuesDayEnd = [0,0,0,0];
+    var labels = ['A', 'B', 'C', 'D'];
+    var valuesLimit5 = [0,0,0,0];
+    var valuesLimit10 = [0,0,0,0];
+    var valuesLimit15 = [0,0,0,0];
 
-Max tid gjeldende måned: <%=(new Date(maxtime[0].startTime.toLocaleString())).toLocaleString()%>, Max strømforbruk: <%=maxtime[0].value%> <%=maxtime[0].uom%>
-<br/>
-Max tid forrige måned: <%=(new Date(maxtime[1].startTime.toLocaleString())).toLocaleString()%>, Max strømforbruk: <%=maxtime[1].value%> <%=maxtime[1].uom%>
+    var valuesFixed = [1,2,3,4];
+    var valuesVariable = [1,2,3,4];
+    var labelsPrice = ['A', 'B', 'C', 'D'];
+
+    var valuesnetprice = [1,2,3,4];
+    var labelsNetPrice = ['A', 'B', 'C', 'D'];
+
+    var valuesPrev = [1,2,3,4];
+    var labelsPrev = ['A', 'B', 'C', 'D'];
+
+    var totalNetPriceVariable = 0;
+    var totalNetPriceFixed = 0;
+    var totalNetPriceVariablePrevMonth = 0;
+    var totalNetPriceFixedPrevMonth = 0;
+
+    var totalConsumptionPrevMonth = 0;
+    var totalConsumptionMonth = 0;
+
+
+    <%for(var i = 0; i < meteringpoints.length; i++){
+
+        var timeLabel = meteringpoints[i].endTime.toLocaleString();
+        var date = new Date(timeLabel);
+        //date = date.getDate() + "-" + date.getHours();
+        date = date.toLocaleString();
+    %>
+        //alert('<%=meteringpoints[i].value%>');
+    <%
+
+    }%>
+
+    <%for(var i = 0; i < tariffPrice.length; i++){
+
+        var timeLabel = tariffPrice[i].expiredAt.toLocaleString();
+        var date = new Date(timeLabel);
+        date = date.toLocaleString();
+    %>
+        //alert('<%=date%>');
+    <%
+
+    }%>
+    var maxPower = 0;
+
+    <%
+    var firstDay = new Date(firstDayInMonth);
+    var tabellIndex = 0;
+    for(var t = 0; t < tariffPrice.length; t++){
+        var timetariff = tariffPrice[t].expiredAt.toLocaleString();
+        var date = new Date(timetariff);
+
+        for(var i = 0; i < meteringpoints.length; i++){
+            var timeLabel = meteringpoints[i].endTime.toLocaleString();
+            if(timetariff == timeLabel){
+                var currentPrice = tariffPrice[t].variablePrice.total * meteringpoints[i].value;
+                var currentFixed = tariffPrice[t].fixedPrices[0].priceLevel[0].total;
+                if(date < firstDay){
+                %>
+                    valuesPrev[<%=i%>] = <%=meteringpoints[i].value%>;
+                    labelsPrev[<%=i%>] = '<%=timeLabel%>';
+
+                    totalNetPriceVariablePrevMonth = totalNetPriceVariablePrevMonth + <%=currentPrice%>;
+                    totalNetPriceFixedPrevMonth = totalNetPriceFixedPrevMonth + <%=currentFixed%>;
+                    totalConsumptionPrevMonth = totalConsumptionPrevMonth + <%=meteringpoints[i].value%>;
+                <%
+                } else {
+                    %>
+                        var currentPower = <%=meteringpoints[i].value%>;
+                        if(currentPower > maxPower){
+                            maxPower = currentPower;
+                        }
+                        totalConsumptionMonth = totalConsumptionMonth + currentPower;
+                        if(<%=date.getHours()%> == 0){
+                            //alert(currentPower);
+                            //alert(maxPower);
+                            valuesDayEnd[<%=tabellIndex%>] = maxPower;
+                            maxPower = 0;
+                        }
+                        values[<%=tabellIndex%>] = currentPower;
+                        labels[<%=tabellIndex%>] = '<%=timeLabel%>';
+                        valuesLimit5[<%=tabellIndex%>] = 5;
+                        valuesLimit10[<%=tabellIndex%>] = 10;
+                        valuesLimit15[<%=tabellIndex%>] = 15;
+
+                        valuesnetprice[<%=tabellIndex%>] = <%=currentPrice%>;
+                        labelsNetPrice[<%=tabellIndex %>] = '<%=timeLabel%>';
+
+                        valuesFixed[<%=tabellIndex%>] = <%=tariffPrice[t].fixedPrices[0].priceLevel[0].total%>;
+                        valuesVariable[<%=tabellIndex%>] = <%=tariffPrice[t].variablePrice.total%>;
+                        labelsPrice[<%=tabellIndex%>] = '<%=timeLabel%>';
+
+                        totalNetPriceVariable = totalNetPriceVariable + <%=currentPrice%>;
+                        totalNetPriceFixed = totalNetPriceFixed + <%=currentFixed%>;
+                           <%
+                    tabellIndex = tabellIndex + 1;
+                    }
+            }
+        }
+    }
+    %>
+
+</script>
+<table>
+    <td>
+        <b>Forrige måned:</b><br/>
+        Max tid forrige måned: <%=(new Date(maxtime[1].startTime.toLocaleString())).toLocaleString()%>, Max strømforbruk: <%=maxtime[1].value%> <%=maxtime[1].uom%>
+        <br/>
+        Variabel nettleie for forrige periode:<script>document.write(Math.round((totalNetPriceVariablePrevMonth + Number.EPSILON) * 100) / 100)</script> NOK
+        <br/>
+        Fastledd nettleie for forrige periode: <script>document.write(Math.round((totalNetPriceFixedPrevMonth + Number.EPSILON) * 100) / 100)</script> NOK
+        <br/>
+        Forbruk forrige periode: <script>document.write(Math.round((totalConsumptionPrevMonth + Number.EPSILON) * 100) / 100)</script> kWh
+    </td>
+    <td>
+        <b>Denne måneden:</b><br/>
+        Max tid gjeldende måned: <%=(new Date(maxtime[0].startTime.toLocaleString())).toLocaleString()%>, Max strømforbruk: <%=maxtime[0].value%> <%=maxtime[0].uom%>
+        <br/>
+        Variabel nettleie for perioden: <script>document.write(Math.round((totalNetPriceVariable + Number.EPSILON) * 100) / 100)</script> NOK
+        <br/>
+        Fastledd nettleie for perioden: <script>document.write(Math.round((totalNetPriceFixed + Number.EPSILON) * 100) / 100)</script> NOK
+        <br/>
+        Forbruk denne perioden: <script>document.write(Math.round((totalConsumptionMonth + Number.EPSILON) * 100) / 100)</script> kWh
+        <br/>
+    </td>
+</table>
+
 
 <canvas id="myChart" width="800" height="150"></canvas>
 
 <canvas id="myNetPriceChart" width="800" height="150"></canvas>
 
 <canvas id="myChartPrice" width="800" height="100"></canvas>
-    
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js"></script>
+
+<canvas id="myChartPrev" width="800" height="100"></canvas>
+
+<!--script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js"></script-->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 var ctx = document.getElementById('myChart');
 var ctxNetPrice = document.getElementById('myNetPriceChart');
 var ctxPrice = document.getElementById('myChartPrice');
+var ctxPrev = document.getElementById('myChartPrev');
 
-var values = [1,2,3,4];
-var labels = ['A', 'B', 'C', 'D'];
+function colorize() {
+    return (ctx) => {
+        var v = ctx.parsed.y;
+        var c = v < 5 ? '#44DE28'
+            : v < 10 ? '#F46300'
+                : v < 15 ? '#D60000'
+                    : '#0358B6';
 
-var valuesFixed = [1,2,3,4];
-var valuesVariable = [1,2,3,4];
-var labelsPrice = ['A', 'B', 'C', 'D'];
-
-var valuesnetprice = [1,2,3,4];
-var labelsNetPrice = ['A', 'B', 'C', 'D'];
-
-
-<%for(var i = 0; i < meteringpoints.length; i++){
-
-    var timeLabel = meteringpoints[i].endTime.toLocaleString();
-    var date = new Date(timeLabel);
-    //date = date.getDate() + "-" + date.getHours();
-    date = date.toLocaleString();
-    %>
-    //alert('<%=meteringpoints[i].value%>');
-    values[<%=i%>] = <%=meteringpoints[i].value%>;
-    labels[<%=i%>] = '<%=date%>';
-    <%
-
-}%>
-
-<%for(var i = 0; i < tariffPrice.length; i++){
-
-    var timeLabel = tariffPrice[i].expiredAt.toLocaleString();
-    var date = new Date(timeLabel);
-    //date = date.getDate() + "-" + date.getHours();
-    date = date.toLocaleString();
-%>
-    //alert('<%=date%>');
-    valuesFixed[<%=i%>] = <%=tariffPrice[i].fixedPrices[0].priceLevel[0].total%>;
-    valuesVariable[<%=i%>] = <%=tariffPrice[i].variablePrice.total%>;
-    labelsPrice[<%=i%>] = '<%=date%>';
-<%
-
-}%>
-
-<%
-for(var t = 0; t < tariffPrice.length; t++){
-    var timetariff = tariffPrice[t].expiredAt.toLocaleString();
-    var date = new Date(timetariff);
-    date = date.toLocaleString();
-    for(var i = 0; i < meteringpoints.length; i++){
-        var timeLabel = meteringpoints[i].endTime.toLocaleString();
-        if(timetariff == timeLabel){
-            var currentPrice = tariffPrice[t].variablePrice.total * meteringpoints[i].value;
-            currentPrice = currentPrice + tariffPrice[t].fixedPrices[0].priceLevel[0].total;
-            %>
-            //alert('<%=currentPrice%>');
-            valuesnetprice[<%=i%>] = <%=currentPrice%>;
-            labelsNetPrice[<%=i%>] = '<%=date%>';
-            <%
-        }
-    }
+        return c ;
+    };
 }
-%>
 
+function colorizePrev() {
+    return (ctxPrev) => {
+        var v = ctxPrev.parsed.y;
+        var c = v < 5 ? '#44DE28'
+            : v < 10 ? '#F46300'
+                : v < 15 ? '#D60000'
+                    : '#0358B6';
 
-//alert('<%=meteringpoints.length%>');
-var myChart = new Chart(ctx, {
- type: 'bar',
- data: {
-    labels: labels,
-    datasets: [{
-        label: 'Strømforbruk',
-        color: "rgba(0,255,0,0.5)",
-        fillColor: "rgba(220,220,220,0.5)",
-        strokeColor: "rgba(220,220,220,0.8)",
-        highlightFill: "rgba(220,220,220,0.75)",
-        highlightStroke: "rgba(220,220,220,1)",
-        data: values
-    }],
-    color: "rgba(0,255,0,0.5)"
- },
-    color: "rgba(0,220,0,0.5)"
-})
+        return c ;
+    };
+}
 
-var myNetPriceChart = new Chart(ctxNetPrice, {
-    type: 'bar',
-    data: {
-        labels: labelsNetPrice,
+</script>
+<script>
+
+    //alert('<%=meteringpoints.length%>');
+    var myChart = new Chart(ctx, {
+     type: 'bar',
+     data: {
+        labels: labels,
         datasets: [{
-            label: 'Nettleie',
-            color: "rgba(0,255,0,0.5)",
-            fillColor: "rgba(220,220,220,0.5)",
-            strokeColor: "rgba(220,220,220,0.8)",
-            highlightFill: "rgba(220,220,220,0.75)",
-            highlightStroke: "rgba(220,220,220,1)",
-            data: valuesnetprice
-        }],
-        color: "rgba(0,255,0,0.5)"
-    },
-    color: "rgba(0,220,0,0.5)"
-})
-
-
-var myChartPrice = new Chart(ctxPrice, {
-    type: 'line',
-    data: {
-        labels: labelsPrice,
-        datasets: [{
-            label: 'Strømpris - Fixed',
-            color: "rgba(0,255,0,0.5)",
-            fillColor: "rgba(220,220,220,0.5)",
-            strokeColor: "rgba(220,220,220,0.8)",
-            highlightFill: "rgba(220,220,220,0.75)",
-            highlightStroke: "rgba(220,220,220,1)",
-            data: valuesFixed
-        },
+                label: 'Strømforbruk',
+                backgroundColor: colorize(),
+                borderColor: colorize(),
+                data: values
+            },
             {
-                label: 'Strømpris - Variabel',
-                color: "rgba(0,255,0,0.5)",
-                fillColor: "rgba(220,220,220,0.5)",
-                strokeColor: "rgba(220,220,220,0.8)",
-                highlightFill: "rgba(220,220,220,0.75)",
-                highlightStroke: "rgba(220,220,220,1)",
-                data: valuesVariable
-            }],
-        color: "rgba(0,255,0,0.5)"
-    },
-    color: "rgba(0,220,0,0.5)"
-})
+                label: 'Dagsrekord',
+                backgroundColor: '#960096',
+                borderColor: '#960096',
+                data: valuesDayEnd
+            },
+            {
+                label: '5 kWh',
+                backgroundColor: '#ffffff',
+                borderColor: '#F46300',
+                data: valuesLimit5,
+                type: 'line',
+                radius: 0,
+                borderDash: [5,10]
+            },
+            {
+                label: '10 kWh',
+                backgroundColor: '#ffffff',
+                borderColor: '#D60000',
+                data: valuesLimit10,
+                type: 'line',
+                radius: 0,
+                borderDash: [5,10]
+            },
+            {
+                label: '15 kWh',
+                backgroundColor: '#ffffff',
+                borderColor: '#0358B6',
+                data: valuesLimit15,
+                type: 'line',
+                radius: 0,
+                borderDash: [5,10]
+            }]
+     }
+    })
+
+    var myNetPriceChart = new Chart(ctxNetPrice, {
+        type: 'bar',
+        data: {
+            labels: labelsNetPrice,
+            datasets: [{
+                label: 'Nettleie',
+                backgroundColor: 'rgb(0, 150, 120)',
+                borderColor: 'rgb(0, 150, 120)',
+                data: valuesnetprice
+            }]
+        }
+    })
+
+
+    var myChartPrice = new Chart(ctxPrice, {
+        type: 'line',
+        data: {
+            labels: labelsPrice,
+            datasets: [{
+                label: 'Strømpris - Fixed',
+                backgroundColor: 'rgb(0, 0, 120)',
+                borderColor: 'rgb(0, 100, 150)',
+                data: valuesFixed
+            },
+                {
+                    label: 'Strømpris - Variabel',
+                    backgroundColor: 'rgb(0, 255, 120)',
+                    borderColor: 'rgb(0, 100, 150)',
+                    data: valuesVariable
+                }]
+        }
+    })
+
+    var myChartPrev = new Chart(ctxPrev, {
+        type: 'bar',
+        data: {
+            labels: labelsPrev,
+            datasets: [{
+                label: 'Strømforbruk forrige måned',
+                backgroundColor: colorizePrev(),
+                borderColor: colorizePrev(),
+                data: valuesPrev
+            }]
+        }
+    })
+
 </script>
 </body>
 </html>
