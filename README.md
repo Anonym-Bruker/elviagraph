@@ -39,7 +39,7 @@ Create common.json in a the config-folder, according to above.
 Run the following command once to download modules:
 npm install
 
-Run one of the following command to star application/server:
+Run one of the following command to start application/server:
 node server.js or npm start
 
 ## Known limitations/bugs

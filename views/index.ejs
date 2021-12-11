@@ -9,22 +9,22 @@
 </head>
 <body>
 <script>
-    var values = [1,2,3,4];
+    var values = [0,2,3,4];
     var valuesDayEnd = [0,0,0,0];
-    var labels = ['A', 'B', 'C', 'D'];
+    var labels = ['', 'B', 'C', 'D'];
     var valuesLimit5 = [0,0,0,0];
     var valuesLimit10 = [0,0,0,0];
     var valuesLimit15 = [0,0,0,0];
 
-    var valuesFixed = [1,2,3,4];
-    var valuesVariable = [1,2,3,4];
-    var labelsPrice = ['A', 'B', 'C', 'D'];
+    var valuesFixed = [0,2,3,4];
+    var valuesVariable = [0,2,3,4];
+    var labelsPrice = ['', 'B', 'C', 'D'];
 
-    var valuesnetprice = [1,2,3,4];
-    var labelsNetPrice = ['A', 'B', 'C', 'D'];
+    var valuesnetprice = [0,2,3,4];
+    var labelsNetPrice = ['', 'B', 'C', 'D'];
 
-    var valuesPrev = [1,2,3,4];
-    var labelsPrev = ['A', 'B', 'C', 'D'];
+    var valuesPrev = [0,2,3,4];
+    var labelsPrev = ['', 'B', 'C', 'D'];
 
     var totalNetPriceVariable = 0;
     var totalNetPriceFixed = 0;
@@ -74,7 +74,7 @@
                 if(date < firstDay){
                 %>
                     valuesPrev[<%=i%>] = <%=meteringpoints[i].value%>;
-                    labelsPrev[<%=i%>] = '<%=timeLabel%>';
+                    labelsPrev[<%=i%>] = '<%="Dag: " + date.getDate()+ " kl: " + date.getHours()%>';
 
                     totalNetPriceVariablePrevMonth = totalNetPriceVariablePrevMonth + <%=currentPrice%>;
                     totalNetPriceFixedPrevMonth = totalNetPriceFixedPrevMonth + <%=currentFixed%>;
@@ -93,18 +93,19 @@
                             valuesDayEnd[<%=tabellIndex%>] = maxPower;
                             maxPower = 0;
                         }
+                        labels[<%=tabellIndex%>] = '<%="Dag: " + date.getDate()+ " kl: " + date.getHours()%>';
                         values[<%=tabellIndex%>] = currentPower;
-                        labels[<%=tabellIndex%>] = '<%=timeLabel%>';
+
                         valuesLimit5[<%=tabellIndex%>] = 5;
                         valuesLimit10[<%=tabellIndex%>] = 10;
                         valuesLimit15[<%=tabellIndex%>] = 15;
 
                         valuesnetprice[<%=tabellIndex%>] = <%=currentPrice%>;
-                        labelsNetPrice[<%=tabellIndex %>] = '<%=timeLabel%>';
+                        labelsNetPrice[<%=tabellIndex %>] = '<%="Dag: " + date.getDate()+ " kl: " + date.getHours()%>';
 
                         valuesFixed[<%=tabellIndex%>] = <%=tariffPrice[t].fixedPrices[0].priceLevel[0].total%>;
                         valuesVariable[<%=tabellIndex%>] = <%=tariffPrice[t].variablePrice.total%>;
-                        labelsPrice[<%=tabellIndex%>] = '<%=timeLabel%>';
+                        labelsPrice[<%=tabellIndex%>] = '<%="Dag: " + date.getDate()+ " kl: " + date.getHours()%>';
 
                         totalNetPriceVariable = totalNetPriceVariable + <%=currentPrice%>;
                         totalNetPriceFixed = totalNetPriceFixed + <%=currentFixed%>;
@@ -142,7 +143,7 @@
 </table>
 
 
-<canvas id="myChart" width="800" height="150"></canvas>
+<canvas id="myChart" width="800" height="250"></canvas>
 
 <canvas id="myNetPriceChart" width="800" height="150"></canvas>
 
@@ -251,13 +252,13 @@ function colorizePrev() {
         data: {
             labels: labelsPrice,
             datasets: [{
-                label: 'Strømpris - Fixed',
+                label: 'Nettleie - Fastledd',
                 backgroundColor: 'rgb(0, 0, 120)',
                 borderColor: 'rgb(0, 100, 150)',
                 data: valuesFixed
             },
                 {
-                    label: 'Strømpris - Variabel',
+                    label: 'Nettleie - Variabel pris',
                     backgroundColor: 'rgb(0, 255, 120)',
                     borderColor: 'rgb(0, 100, 150)',
                     data: valuesVariable
