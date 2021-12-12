@@ -4,6 +4,8 @@ const https = require('https');
 
 var app = express();
 
+app.use(express.static('public'));
+
 var port = config.port;
 
 var values = [1];
@@ -14,6 +16,8 @@ app.set('view engine', 'ejs');
 var meteringpoints = {};
 var tariffPrice = {};
 var maxtime = {};
+
+var darkmode = "off";
 
 var firstDayInMonth = setFirstDay(new Date());
 var firstDayInPrevMonth = setfirstPrevMonth(new Date());
@@ -26,9 +30,31 @@ app.get('/noreload', function (req, res) {
           meteringpoints,
           tariffPrice,
           maxtime,
-          firstDayInMonth
+          firstDayInMonth,
+          darkmode
        })
 })
+
+app.get('/mode/:mode', function (req, res) {
+    if (req.params.mode != null) {
+        if (req.params.mode == "1") {
+            logging("Changing to nightmode")
+            darkmode = "on";
+            res.redirect('/noreload')
+        } else if (req.params.mode == "daymode") {
+            logging("Changing to daymode")
+            darkmode = "off";
+            res.redirect('/noreload')
+        } else if (req.params.mode == "reload") {
+            logging("Reloading, running normal get")
+            res.redirect('/')
+        } else {
+            logging("NO action , not reloading")
+            res.redirect('/noreload')
+        }
+    }
+})
+
 
 app.get('/', function (req, res) {
     var currentdate = new Date();
@@ -54,7 +80,12 @@ app.get('/', function (req, res) {
 
             // The whole response has been received. Print out the result.
             resp.on('end', () => {
-                meteringpoints = JSON.parse(data).meteringpoints[0].metervalue.timeSeries;
+                if(JSON.parse(data).meteringpoints != undefined){
+                    meteringpoints = JSON.parse(data).meteringpoints[0].metervalue.timeSeries;
+                } else {
+                    logging("Metering data not found...." + JSON.stringify(data));
+                }
+
                 //logging("Done with getting metering data...." + JSON.stringify(meteringpoints));
             });
 
@@ -72,7 +103,11 @@ app.get('/', function (req, res) {
 
                     // The whole response has been received. Print out the result.
                     resp.on('end', () => {
-                        maxtime = JSON.parse(data).meteringpoints[0].maxHours;
+                        if(JSON.parse(data).meteringpoints != undefined){
+                            maxtime = JSON.parse(data).meteringpoints[0].maxHours;
+                        } else {
+                            logging("Metering data not found...." + JSON.stringify(data));
+                        }
                         //logging("Done with getting maxtime data...." + JSON.stringify(maxtime));
                     });
 
@@ -101,7 +136,8 @@ app.get('/', function (req, res) {
                                         meteringpoints,
                                         tariffPrice,
                                         maxtime,
-                                        firstDayInMonth
+                                        firstDayInMonth,
+                                        darkmode
                                     })
                             });
                         }).on("error", (err) => {

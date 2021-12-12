@@ -5,7 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Strømforbruk-Elvia</title>
+    <%if(darkmode == "on"){%>
+    <link rel="stylesheet" href="dark.css">
+    <%}%>
+    <%if(darkmode == "off"){%>
     <link rel="stylesheet" href="main.css">
+    <%}%>
 </head>
 <body>
 <script>
@@ -119,7 +124,7 @@
 
 </script>
 <table>
-    <td>
+    <td width="600">
         <b>Forrige måned:</b><br/>
         Max tid forrige måned: <%=(new Date(maxtime[1].startTime.toLocaleString())).toLocaleString()%>, Max strømforbruk: <%=maxtime[1].value%> <%=maxtime[1].uom%>
         <br/>
@@ -129,7 +134,7 @@
         <br/>
         Forbruk forrige periode: <script>document.write(Math.round((totalConsumptionPrevMonth + Number.EPSILON) * 100) / 100)</script> kWh
     </td>
-    <td>
+    <td width="600">
         <b>Denne måneden:</b><br/>
         Max tid gjeldende måned: <%=(new Date(maxtime[0].startTime.toLocaleString())).toLocaleString()%>, Max strømforbruk: <%=maxtime[0].value%> <%=maxtime[0].uom%>
         <br/>
@@ -139,6 +144,23 @@
         <br/>
         Forbruk denne perioden: <script>document.write(Math.round((totalConsumptionMonth + Number.EPSILON) * 100) / 100)</script> kWh
         <br/>
+    </td>
+    <td width="300" align="center">
+        <%if(darkmode == "on"){%>
+            <form action="/mode/daymode" method="get">
+                <input type="submit" value="Darkmode off" style="height:75px; width:200px">
+            </form>
+        <%}%>
+        <%if(darkmode == "off"){%>
+            <form action="/mode/1" method="get">
+                <input type="submit" value="Darkmode on" style="height:75px; width:200px">
+            </form>
+        <%}%>
+    </td>
+    <td width="300" align="center">
+        <form action="/mode/reload" method="get">
+            <input type="submit" value="Reload page" style="height:75px; width:200px">
+        </form>
     </td>
 </table>
 
@@ -188,49 +210,74 @@ function colorizePrev() {
 
     //alert('<%=meteringpoints.length%>');
     var myChart = new Chart(ctx, {
-     type: 'bar',
-     data: {
-        labels: labels,
-        datasets: [{
-                label: 'Strømforbruk',
-                backgroundColor: colorize(),
-                borderColor: colorize(),
-                data: values
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                    label: 'Strømforbruk',
+                    backgroundColor: colorize(),
+                    borderColor: colorize(),
+                    data: values
+                },
+                {
+                    label: 'Dagsrekord',
+                    backgroundColor: '#960096',
+                    borderColor: '#960096',
+                    data: valuesDayEnd
+                },
+                {
+                    label: '5 kWh',
+                    backgroundColor: '#ffffff',
+                    borderColor: '#F46300',
+                    data: valuesLimit5,
+                    type: 'line',
+                    radius: 0,
+                    borderDash: [5,10]
+                },
+                {
+                    label: '10 kWh',
+                    backgroundColor: '#ffffff',
+                    borderColor: '#D60000',
+                    data: valuesLimit10,
+                    type: 'line',
+                    radius: 0,
+                    borderDash: [5,10]
+                },
+                {
+                    label: '15 kWh',
+                    backgroundColor: '#ffffff',
+                    borderColor: '#0358B6',
+                    data: valuesLimit15,
+                    type: 'line',
+                    radius: 0,
+                    borderDash: [5,10]
+                }],
+
+        },
+        options: {
+            labels: {
+                fontColor: '#ffffff',
+                fontSize: 18
             },
-            {
-                label: 'Dagsrekord',
-                backgroundColor: '#960096',
-                borderColor: '#960096',
-                data: valuesDayEnd
-            },
-            {
-                label: '5 kWh',
-                backgroundColor: '#ffffff',
-                borderColor: '#F46300',
-                data: valuesLimit5,
-                type: 'line',
-                radius: 0,
-                borderDash: [5,10]
-            },
-            {
-                label: '10 kWh',
-                backgroundColor: '#ffffff',
-                borderColor: '#D60000',
-                data: valuesLimit10,
-                type: 'line',
-                radius: 0,
-                borderDash: [5,10]
-            },
-            {
-                label: '15 kWh',
-                backgroundColor: '#ffffff',
-                borderColor: '#0358B6',
-                data: valuesLimit15,
-                type: 'line',
-                radius: 0,
-                borderDash: [5,10]
-            }]
-     }
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        fontColor: '#ffffff',
+                        fontSize: 18,
+                        stepSize: 1,
+                        beginAtZero: true
+                    }
+                }],
+                xAxes: [{
+                    ticks: {
+                        fontColor: '#ffffff',
+                        fontSize: 14,
+                        stepSize: 1,
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
     })
 
     var myNetPriceChart = new Chart(ctxNetPrice, {
