@@ -124,7 +124,7 @@
 
 </script>
 <table>
-    <td width="600">
+    <td width="750">
         <b>Forrige måned:</b><br/>
         Max tid forrige måned: <%=(new Date(maxtime[1].startTime.toLocaleString())).toLocaleString()%>, Max strømforbruk: <%=maxtime[1].value%> <%=maxtime[1].uom%>
         <br/>
@@ -134,7 +134,7 @@
         <br/>
         Forbruk forrige periode: <script>document.write(Math.round((totalConsumptionPrevMonth + Number.EPSILON) * 100) / 100)</script> kWh
     </td>
-    <td width="600">
+    <td width="750">
         <b>Denne måneden:</b><br/>
         Max tid gjeldende måned: <%=(new Date(maxtime[0].startTime.toLocaleString())).toLocaleString()%>, Max strømforbruk: <%=maxtime[0].value%> <%=maxtime[0].uom%>
         <br/>
@@ -145,21 +145,20 @@
         Forbruk denne perioden: <script>document.write(Math.round((totalConsumptionMonth + Number.EPSILON) * 100) / 100)</script> kWh
         <br/>
     </td>
-    <td width="300" align="center">
+    <td width="200" align="center">
         <%if(darkmode == "on"){%>
             <form action="/mode/daymode" method="get">
-                <input type="submit" value="Darkmode off" style="height:75px; width:200px">
+                <input type="submit" value="Darkmode off" style="height:50px; width:150px">
             </form>
         <%}%>
         <%if(darkmode == "off"){%>
             <form action="/mode/1" method="get">
-                <input type="submit" value="Darkmode on" style="height:75px; width:200px">
+                <input type="submit" value="Darkmode on" style="height:50px; width:150px">
             </form>
         <%}%>
-    </td>
-    <td width="300" align="center">
+        <br/>
         <form action="/mode/reload" method="get">
-            <input type="submit" value="Reload page" style="height:75px; width:200px">
+            <input type="submit" value="Reload page" style="height:50px; width:150px">
         </form>
     </td>
 </table>
